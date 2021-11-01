@@ -8,11 +8,11 @@ My contributions to Lahmacun Radio analytics team.
 1. Getting number of unique listeners per day:
     + fetching AzuraCast API
     + storing relevant data in a Python dictionary
-    + automising data storing twice every minute
-    + automising export to csv (or parquet ? feather?) every n hours
+    + automating API snapshot twice every minute to update dictionary
+    + automating export to csv (or parquet ? feather?) every n hours
 2. Getting total listened time per show per week
 
-### Details on outputted csv :
+### Details on outputted .csv :
 
 In [example.csv](/example.csv), the first two fields 'ip' and 'location' are self-explanatory. The third field 'connected_time' is populated by arrays of one or more arrays. If there are indeed several arrays, this means the corresponding user has connected several times to the broadcast. NB: by *connected*, we mean pressing play until pressing pause or closing tab.
 

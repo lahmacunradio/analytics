@@ -2,7 +2,8 @@
 
 <img width="408" alt="lahma" src="https://user-images.githubusercontent.com/84317349/139689563-4ab78163-26f0-4a4c-a745-847eecfbfd55.png">
 
-My contributions to Lahmacun Radio analytics team <3
+Contributions to Lahmacun Radio analytics team.<br>
+Lahmacun is a community music webradio based in Budapest.
 
 ### Objectives:
 1. Getting number of unique listeners per day:
@@ -10,7 +11,7 @@ My contributions to Lahmacun Radio analytics team <3
     + storing relevant data in a Python dictionary
     + automating API snapshot twice every minute to update dictionary
     + automating export to csv (or parquet ? feather?) every n hours
-2. Getting total listened time per show per week
+2. Getting total listened time per show per wee
 
 ### Details on outputted .csv :
 

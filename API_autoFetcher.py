@@ -2,6 +2,7 @@ import requests
 import datetime
 import threading
 import pandas as pd
+import sys
 
 '''
 import custom module 'access.py' to access your own API token and log in:
@@ -17,6 +18,8 @@ monitored_data = {
     'connected_time': [],
     'valid': []
 }
+
+global n_hours
 
 '''
 This method fetches the Azuracast API and updates 'monitored_data' dictionary above.
@@ -72,6 +75,10 @@ def snapshot(minutes_threshold):
             else:
                 monitored_data['valid'].append(0)
 
+    timestamp = datetime.datetime.now()
+    time = timestamp.time()
+    print('snapshot at ' + str(time)[:8])
+
 '''
 This method automates the snapshot() method every 30 seconds.
 An integer is passed as argument representing the minimum minutes threshold
@@ -84,22 +91,44 @@ def autoFetch(minutes_threshold = 5):
 
 '''
 This method automates the three steps below every n hours. 
-If no argument is passed, the default value is set to 24 hours.
 1. Converting the 'monitored_data' dictionary to a pandas dataframe
 2. Exporting the df in question to a .csv file (e.g: lahma_1989-11-09.csv)
 3. Returning 'total_listeners' (nbr of valid listeners) during the monitored time frame
 '''
-def autoExport(n_hours = 24.0):
-    n_seconds = float(n_hours) * 3600.0
-    threading.Timer(n_seconds, autoExport).start()
+def autoExport():
+    global n_hours
+    threading.Timer(n_hours * 3600.0, autoExport).start()
     timestamp = datetime.datetime.now()
-    timestamp = timestamp.date()
+    time = timestamp.time()
+    date = timestamp.date()
     df = pd.DataFrame(monitored_data)
-    df.to_csv('lahma_' + str(timestamp) + '.csv')
+    df.to_csv('lahma_' + str(date) + '.csv')
     total_listeners = sum(df['valid'])
+    print('export at', str(time)[:8], '| total listeners:', str(total_listeners))
     return total_listeners
 
+'''
+This method aggregates the two automated methods above to allow 
+method call with passed arguments through the command line. Format below :
+$ python API_autoFetcher.py <minutes_threshold> <n_hours>
+'''
+def automate(minutes_threshold, n):
+
+    autoFetch(float(minutes_threshold))
+
+    global n_hours
+    n_hours = float(n)
+    autoExport()
+
 if __name__ == '__main__':
-    autoFetch(5) # listeners are flagged valid above 5 minutes of listening time
-    autoExport(0.5) # exports and returns nbr of valid listeners every half an hour
+
+    if len(sys.argv) != 3:
+        print('''------ Enter two integer parameters as shown in example below: 
+------ $ python API_autoFetcher.py 5 24
+------
+------ (above script validates a listener above 5 minutes of listening time,
+------ exports and returns total number of valid listeners every 24 hours)''')
+    else:
+        automate(sys.argv[1], sys.argv[2])
+
 

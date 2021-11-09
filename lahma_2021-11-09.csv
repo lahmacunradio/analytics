@@ -1,0 +1,3 @@
+,ip,location,connected_time,valid
+0,185.62.102.73,Russia,"[[datetime.datetime(2021, 11, 9, 11, 55, 31, 39540), datetime.timedelta(seconds=15326)]]",1
+1,37.19.217.81,Ukraine,"[[datetime.datetime(2021, 11, 9, 11, 55, 31, 39548), datetime.timedelta(seconds=26)]]",0

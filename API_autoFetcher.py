@@ -5,9 +5,8 @@ import pandas as pd
 
 '''
 import custom module 'access.py' to access your own API token and log in:
-
-$ cat access.py 
-MY_KEY = "Bearer xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    $ cat access.py 
+    MY_KEY = "Bearer xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 '''
 import access
 API_KEY = access.MY_KEY
@@ -19,7 +18,11 @@ monitored_data = {
     'valid': []
 }
 
-
+'''
+This method fetches the Azuracast API and updates 'monitored_data' dictionary above.
+An integer is passed as argument representing the minimum minutes threshold
+under which a listener is considered not 'valid'.
+'''
 def snapshot(minutes_threshold):
 
     headers = {'Authorization': API_KEY}
@@ -36,6 +39,8 @@ def snapshot(minutes_threshold):
         ip = listener['ip']
 
         if listener['location']['status'] == 'error':
+            # this handles the case where the API is malfunctioning and returns
+            # 'error' as location status and identical 'ip' for all listeners
             loc = 'N/A'
         else:
             loc = listener['location']['country']
@@ -67,20 +72,34 @@ def snapshot(minutes_threshold):
             else:
                 monitored_data['valid'].append(0)
 
+'''
+This method automates the snapshot() method every 30 seconds.
+An integer is passed as argument representing the minimum minutes threshold
+under which a listener is considered not 'valid'. If no argument is specified,
+the default value is set to 5 minutes.
+'''
 def autoFetch(minutes_threshold = 5):
     threading.Timer(30.0, autoFetch).start()
     snapshot(minutes_threshold)
 
-def autoExport(n_hours = 24):
-    n_seconds = n_hours * 3600.0
+'''
+This method automates three steps below every n hours. 
+If no argument passed, the default value is set to 24 hours.
+1. Converting the 'monitored_data' dictionary to a pandas dataframe
+2. Exporting the df in question to a .csv file (e.g: lahma_1989-11-09.csv)
+3. Returning 'total_listeners' during the monitored time frame
+'''
+def autoExport(n_hours = 24.0):
+    n_seconds = float(n_hours) * 3600.0
     threading.Timer(n_seconds, autoExport).start()
     timestamp = datetime.datetime.now()
+    timestamp = timestamp.date()
     df = pd.DataFrame(monitored_data)
     df.to_csv('lahma_' + str(timestamp) + '.csv')
     total_listeners = sum(df['valid'])
     return total_listeners
 
 if __name__ == '__main__':
-    autoFetch(5)
-    autoExport(1)
+    autoFetch(5) # only counts as valid listeners that listened more than 5 minutes
+    autoExport(0.5) # exports every half an hour
 

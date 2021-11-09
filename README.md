@@ -6,12 +6,40 @@ Contributions to Lahmacun Radio analytics team.<br>
 Lahmacun is a community music webradio based in Budapest.
 
 ### Objectives:
-1. Getting number of unique listeners per day:
-    + fetching AzuraCast API
-    + storing relevant data in a Python dictionary
-    + automating API snapshot twice every minute to update dictionary
-    + automating export to csv (or parquet ? feather?) every n hours
-2. Getting total listened time per show per wee
+1. Get number of unique listeners per day:
+    + fetch AzuraCast API
+    + store relevant data in a Python dictionary
+    + automate API snapshot twice every minute to update dictionary
+    + automate export to csv (or parquet ? feather?) + return of total valid listeners every n hours
+2. Get total listened time per show per week
+
+### Dependencies:
+
+1. Create a virtual environment :
+
+        python -m venv virtual
+        
+2. Activate the virtual environment :
+
+    on Linux / Mac OS:
+
+        source virtual/Scripts/activate
+        
+    on Windows:
+        
+        .\virtual\Scripts\activate
+        
+3. Install the necessary librairies :
+
+        pip install pandas
+
+### Usage:
+Methods from *API_autoFetcher.py* can be called through the command line, like so:
+
+    $ python API_autoFetcher.py <minutes_threshold> <n_hours>
+
+1. **<minutes_threshold>** : minimum listening time threshold to validate a listener (in minutes).
+2. **<n_hours>** : determines the occurrences of exports (in hours).
 
 ### Details on outputted .csv :
 

@@ -83,11 +83,11 @@ def autoFetch(minutes_threshold = 5):
     snapshot(minutes_threshold)
 
 '''
-This method automates three steps below every n hours. 
-If no argument passed, the default value is set to 24 hours.
+This method automates the three steps below every n hours. 
+If no argument is passed, the default value is set to 24 hours.
 1. Converting the 'monitored_data' dictionary to a pandas dataframe
 2. Exporting the df in question to a .csv file (e.g: lahma_1989-11-09.csv)
-3. Returning 'total_listeners' during the monitored time frame
+3. Returning 'total_listeners' (nbr of valid listeners) during the monitored time frame
 '''
 def autoExport(n_hours = 24.0):
     n_seconds = float(n_hours) * 3600.0
@@ -100,6 +100,6 @@ def autoExport(n_hours = 24.0):
     return total_listeners
 
 if __name__ == '__main__':
-    autoFetch(5) # only counts as valid listeners that listened more than 5 minutes
-    autoExport(0.5) # exports every half an hour
+    autoFetch(5) # listeners are flagged valid above 5 minutes of listening time
+    autoExport(0.5) # exports and returns nbr of valid listeners every half an hour
 

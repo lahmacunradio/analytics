@@ -5,9 +5,8 @@ import pandas as pd
 import sys
 
 '''
-import custom module 'access.py' to access your own API token and log in:
-    $ cat access.py 
-    MY_KEY = "Bearer xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+Create and import custom module 'access.py' to access your own API token and log in.
+See 'access_template.py' for template.
 '''
 import access
 API_KEY = access.MY_KEY

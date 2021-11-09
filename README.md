@@ -41,7 +41,7 @@ Methods from *API_autoFetcher.py* can be called through the command line, like s
 1. **<minutes_threshold>** : minimum listening time threshold to validate a listener (in minutes).
 2. **<n_hours>** : determines the occurrences of exports (in hours).
 
-## Details on outputted .csv :
+## Details on outputted csv file :
 
 In [example.csv](/example.csv), the first two fields 'ip' and 'location' are self-explanatory. The third field 'connected_time' is populated by arrays of one or more arrays. If there are indeed several arrays, this means the corresponding user has connected several times to the broadcast. NB: by *connected*, we mean pressing play until pressing pause or closing tab.
 

@@ -4,12 +4,14 @@ import threading
 import pandas as pd
 import sys
 
+
 '''
 Create and import custom module 'access.py' to access your own API token and log in.
 See 'access_template.py' for template.
 '''
 import access
 API_KEY = access.MY_KEY
+
 
 monitored_data = {
     'ip': [],
@@ -19,6 +21,7 @@ monitored_data = {
 }
 
 global n_hours
+
 
 '''
 This method fetches the Azuracast API and updates 'monitored_data' dictionary above.
@@ -78,6 +81,7 @@ def snapshot(minutes_threshold):
     time = timestamp.time()
     print('snapshot at ' + str(time)[:8])
 
+
 '''
 This method automates the snapshot() method every 30 seconds.
 An integer is passed as argument representing the minimum minutes threshold
@@ -87,6 +91,7 @@ the default value is set to 5 minutes.
 def autoFetch(minutes_threshold = 5):
     threading.Timer(30.0, autoFetch).start()
     snapshot(minutes_threshold)
+
 
 '''
 This method automates the three steps below every n hours. 
@@ -106,6 +111,7 @@ def autoExport():
     print('export at', str(time)[:8], '| total listeners:', str(total_listeners))
     return total_listeners
 
+
 '''
 This method aggregates the two automated methods above to allow 
 method call with passed arguments through the command line. Format below :
@@ -119,6 +125,7 @@ def automate(minutes_threshold, n):
     n_hours = float(n)
     autoExport()
 
+
 if __name__ == '__main__':
 
     if len(sys.argv) != 3:
@@ -129,5 +136,3 @@ if __name__ == '__main__':
 ------ exports and returns total number of valid listeners every 24 hours)''')
     else:
         automate(sys.argv[1], sys.argv[2])
-
-

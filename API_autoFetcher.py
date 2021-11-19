@@ -105,12 +105,11 @@ def autoExport():
     timestamp = datetime.datetime.now()
     time = timestamp.time()
     date = timestamp.date()
+    
     df = pd.DataFrame(monitored_data)
-    df.to_csv('lahma_' + str(date) + '.csv')
-    total_listeners = sum(df['valid'])
-    print('export at', str(time)[:8], '| total listeners:', str(total_listeners))
-    return total_listeners
-
+    total_valid_listeners = sum(df['valid'])
+    df.loc[len(df)] = ['Total', None, None, total_valid_listeners]
+    df.to_csv('lahma_' + str(date) + '.csv', index=False)
 
 '''
 This method aggregates the two automated methods above to allow 

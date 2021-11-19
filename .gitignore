@@ -1,6 +1,9 @@
 # custom API access file
 access.py
 
+# test files
+test/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

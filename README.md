@@ -17,21 +17,15 @@ Lahmacun is a community music webradio based in Budapest.
 
 1. Create a virtual environment :
 
-        python -m venv virtual
+        python3 -m venv virtual
         
 2. Activate the virtual environment :
 
-    on Linux / Mac OS:
-
         source virtual/Scripts/activate
-        
-    on Windows:
-        
-        .\virtual\Scripts\activate
         
 3. Install the necessary librairies :
 
-        pip install pandas
+        pip install -r requirements.txt
 
 ## Usage:
 Methods from *API_autoFetcher.py* can be called through the command line, like so:

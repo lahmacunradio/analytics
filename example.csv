@@ -1,23 +1,8 @@
-,ip,location,connected_time
-0,185.62.102.73,Russia,"[[datetime.datetime(2021, 10, 14, 12, 23, 58, 464265), datetime.timedelta(seconds=31261)], [datetime.datetime(2021, 10, 14, 12, 58, 48, 479164), datetime.timedelta(seconds=79463)]]"
-1,185.209.105.87,Germany,"[[datetime.datetime(2021, 10, 14, 12, 23, 58, 464278), datetime.timedelta(seconds=56624)]]"
-2,35.189.120.47,United States,"[[datetime.datetime(2021, 10, 14, 12, 23, 58, 464284), datetime.timedelta(seconds=3332)], [datetime.datetime(2021, 10, 14, 20, 36, 37, 476916), datetime.timedelta(seconds=532)]]"
-3,188.6.182.180,Hungary,"[[datetime.datetime(2021, 10, 14, 12, 23, 58, 464288), datetime.timedelta(seconds=10141)], [datetime.datetime(2021, 10, 14, 16, 7, 19, 284460), datetime.timedelta(seconds=1726)]]"
-4,46.246.159.28,Greece,"[[datetime.datetime(2021, 10, 14, 12, 23, 58, 464293), datetime.timedelta(seconds=1255)]]"
-5,176.63.1.250,Hungary,"[[datetime.datetime(2021, 10, 14, 12, 23, 58, 464297), datetime.timedelta(seconds=916)]]"
-6,93.189.113.202,Hungary,"[[datetime.datetime(2021, 10, 14, 12, 23, 58, 464301), datetime.timedelta(seconds=233)], [datetime.datetime(2021, 10, 14, 12, 30, 18, 300929), datetime.timedelta(seconds=181)]]"
-7,62.74.19.211,Greece,"[[datetime.datetime(2021, 10, 14, 12, 32, 48, 309480), datetime.timedelta(seconds=1)]]"
-8,34.89.94.204,United States,"[[datetime.datetime(2021, 10, 14, 14, 28, 10, 329225), datetime.timedelta(seconds=3465)], [datetime.datetime(2021, 10, 15, 10, 46, 10, 516613), datetime.timedelta(seconds=1028)]]"
-9,34.88.5.79,United States,"[[datetime.datetime(2021, 10, 14, 15, 32, 18, 854703), datetime.timedelta(seconds=3453)]]"
-10,37.76.74.48,Hungary,"[[datetime.datetime(2021, 10, 14, 15, 34, 18, 890318), datetime.timedelta(seconds=76)]]"
-11,82.36.115.76,United Kingdom,"[[datetime.datetime(2021, 10, 14, 16, 6, 19, 260496), datetime.timedelta(seconds=317)], [datetime.datetime(2021, 10, 14, 16, 11, 49, 327280), datetime.timedelta(seconds=1442)]]"
-12,188.4.147.89,Greece,"[[datetime.datetime(2021, 10, 14, 16, 8, 49, 298086), datetime.timedelta(seconds=123)]]"
-13,78.131.58.20,Hungary,"[[datetime.datetime(2021, 10, 14, 16, 19, 51, 175619), datetime.timedelta(seconds=977)]]"
-14,179.183.111.51,Brazil,"[[datetime.datetime(2021, 10, 14, 16, 31, 19, 573712), datetime.timedelta(seconds=2)]]"
-15,176.63.9.209,Hungary,"[[datetime.datetime(2021, 10, 14, 20, 35, 7, 452538), datetime.timedelta(seconds=412)]]"
-16,34.89.104.228,United States,"[[datetime.datetime(2021, 10, 14, 22, 47, 47, 232942), datetime.timedelta(seconds=3480)]]"
-17,80.98.158.42,Hungary,"[[datetime.datetime(2021, 10, 14, 22, 55, 47, 84051), datetime.timedelta(seconds=930)]]"
-18,46.107.173.64,Hungary,"[[datetime.datetime(2021, 10, 14, 23, 28, 17, 365491), datetime.timedelta(seconds=14)]]"
-19,178.166.67.146,Portugal,"[[datetime.datetime(2021, 10, 14, 23, 48, 17, 617215), datetime.timedelta(seconds=1)]]"
-20,186.227.175.251,Brazil,"[[datetime.datetime(2021, 10, 14, 23, 55, 17, 653434), datetime.timedelta(0)]]"
-21,139.28.219.154,France,"[[datetime.datetime(2021, 10, 15, 10, 44, 10, 515103), datetime.timedelta(seconds=54)], [datetime.datetime(2021, 10, 15, 10, 45, 10, 527106), datetime.timedelta(seconds=66)]]"
+,ip,location,connected_time,valid
+0,185.62.102.70,Russia,"[[datetime.datetime(2021, 11, 19, 15, 19, 20, 314268), datetime.timedelta(seconds=8523)]]",1
+1,176.63.9.179,Hungary,"[[datetime.datetime(2021, 11, 19, 15, 19, 20, 314275), datetime.timedelta(seconds=4894)]]",1
+2,86.252.247.202,France,"[[datetime.datetime(2021, 11, 19, 15, 19, 50, 222799), datetime.timedelta(seconds=1143)], [datetime.datetime(2021, 11, 19, 15, 40, 50, 447183), datetime.timedelta(seconds=618)], [datetime.datetime(2021, 11, 19, 16, 2, 20, 716340), datetime.timedelta(seconds=993)]]",1
+3,160.238.38.43,United States,"[[datetime.datetime(2021, 11, 19, 15, 20, 20, 250537), datetime.timedelta(seconds=63)]]",0
+4,95.20.249.165,Spain,"[[datetime.datetime(2021, 11, 19, 15, 58, 20, 649205), datetime.timedelta(seconds=3)]]",0
+5,195.56.141.130,Hungary,"[[datetime.datetime(2021, 11, 19, 15, 59, 50, 843950), datetime.timedelta(seconds=1143)]]",1
+6,Total,,,4

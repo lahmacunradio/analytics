@@ -1,5 +1,6 @@
 import requests
 import datetime
+import time
 import threading
 import pandas as pd
 import sys
@@ -18,6 +19,13 @@ monitored_data = {
     'location': [],
     'connected_time': [],
     'valid': []
+}
+
+computed_data = {
+    'ip': ['Total Listeners', 'Total Valid Listeners'],
+    'location': [None, None],
+    'connected_time': [None, None],
+    'valid': [0, 0]
 }
 
 global n_hours
@@ -40,6 +48,9 @@ def snapshot(minutes_threshold):
 
         connected_time = listener['connected_time']
         connected_time = datetime.timedelta(seconds=connected_time)
+        timestamp = datetime.datetime.now()
+        formatted_timestamp = timestamp.isoformat(sep=' ')
+        formatted_timestamp = str(formatted_timestamp)[:-7]
 
         ip = listener['ip']
 
@@ -60,7 +71,7 @@ def snapshot(minutes_threshold):
                 else:
                     monitored_data['valid'][i] = 0
             else:
-                monitored_data['connected_time'][i].append([datetime.datetime.now(), connected_time])
+                monitored_data['connected_time'][i].append([formatted_timestamp, connected_time])
                 if connected_time > minutes_threshold:
                     monitored_data['valid'][i] = 1
                 else:
@@ -70,16 +81,14 @@ def snapshot(minutes_threshold):
         else:
             monitored_data['ip'].append(ip)
             monitored_data['location'].append(loc)
-            monitored_data['connected_time'].append([[datetime.datetime.now(), connected_time]])
+            monitored_data['connected_time'].append([[formatted_timestamp, connected_time]])
 
             if connected_time > minutes_threshold:
                 monitored_data['valid'].append(1)
             else:
                 monitored_data['valid'].append(0)
 
-    timestamp = datetime.datetime.now()
-    time = timestamp.time()
-    print('snapshot at ' + str(time)[:8])
+    # print('snapshot on ' + str(timestamp)[:-7])
 
 
 '''
@@ -103,13 +112,24 @@ def autoExport():
     global n_hours
     threading.Timer(n_hours * 3600.0, autoExport).start()
     timestamp = datetime.datetime.now()
-    time = timestamp.time()
+    time = str(timestamp.time())[:5]
     date = timestamp.date()
     
     df = pd.DataFrame(monitored_data)
+    
     total_valid_listeners = sum(df['valid'])
-    df.loc[len(df)] = ['Total', None, None, total_valid_listeners]
-    df.to_csv('lahma_' + str(date) + '.csv', index=False)
+    # df.loc[len(df)] = ['Total valid users', None, None, total_valid_listeners]
+    computed_data['valid'][0] = len(df)
+    computed_data['valid'][1] = total_valid_listeners
+    
+    df2 = pd.DataFrame(computed_data)
+    
+    # print(computed_data)
+    
+    df = df.append(df2)
+    
+    df.to_csv('lahma_' + str(date) + '_' + time + '.csv', index=False)
+    print('> export on ' + str(timestamp)[:-7])
 
 '''
 This method aggregates the two automated methods above to allow 
@@ -122,6 +142,7 @@ def automate(minutes_threshold, n):
 
     global n_hours
     n_hours = float(n)
+    time.sleep(n_hours * 3600)
     autoExport()
 
 

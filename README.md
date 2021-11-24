@@ -15,15 +15,23 @@ Lahmacun is a community music webradio based in Budapest.
 
 ## Dependencies:
 
-1. Create a virtual environment :
+### 1. Create a virtual environment : 
++ on Linux/Mac OS: 
 
         python3 -m venv virtual
-        
-2. Activate the virtual environment :
++ on Windows:
 
-        source virtual/Scripts/activate
+        python -m venv virtual
         
-3. Install the necessary librairies :
+### 2. Activate the virtual environment :
++ on Linux/Mac OS : 
+        
+        source virtual/bin/activate
++ on Windows :
+
+        virtual/Scripts/activate
+        
+### 3. Install the necessary librairies :
 
         pip install -r requirements.txt
 

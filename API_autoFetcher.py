@@ -22,10 +22,16 @@ monitored_data = {
 }
 
 computed_data = {
-    'ip': ['Total Listeners', 'Total Valid Listeners'],
-    'location': [None, None],
-    'connected_time': [None, None],
-    'valid': [0, 0]
+    'ip': [
+      'Total Listeners', 
+      'Total Valid Listeners', 
+      'Total Ghost Listeners', 
+      'Total N/A entries',
+      'Total Sessions'
+    ],
+    'location': [None, None, None, None, None],
+    'connected_time': [None, None, None, None, None],
+    'valid': [0, 0, 0, 0, 0]
 }
 
 global n_hours
@@ -34,7 +40,7 @@ global n_hours
 '''
 This method fetches the Azuracast API and updates 'monitored_data' dictionary above.
 An integer is passed as argument representing the minimum minutes threshold
-under which a listener is considered not 'valid'.
+under which a listener is considered 'not valid'.
 '''
 def snapshot(minutes_threshold):
 
@@ -55,9 +61,12 @@ def snapshot(minutes_threshold):
         ip = listener['ip']
 
         if listener['location']['status'] == 'error':
-            # this handles the case where the API is malfunctioning and returns
-            # 'error' as location status and identical 'ip' for all listeners
+            '''
+            this handles the case where the API is malfunctioning and returns
+            'error' as location status and one or a couple identical ips for all listeners
+            '''
             loc = 'N/A'
+            computed_data['valid'][3] += 1
         else:
             loc = listener['location']['country']
 
@@ -93,7 +102,7 @@ def snapshot(minutes_threshold):
 
 '''
 This method automates the snapshot() method every 30 seconds.
-An integer is passed as argument representing the minimum minutes threshold
+An integer is passed as an argument representing the minimum minutes threshold
 under which a listener is considered not 'valid'. If no argument is specified,
 the default value is set to 5 minutes.
 '''
@@ -104,31 +113,64 @@ def autoFetch(minutes_threshold = 5):
 
 '''
 This method automates the three steps below every n hours. 
-1. Converting the 'monitored_data' dictionary to a pandas dataframe
-2. Exporting the df in question to a .csv file (e.g: lahma_1989-11-09.csv)
-3. Returning 'total_listeners' (nbr of valid listeners) during the monitored time frame
+1. Converting the 'monitored_data' dictionary to pandas dataframe 'df_monitored'
+2. Logging following data to 'computed_data' dictionary :
+    + 'Total Listeners'
+    + 'Total Valid Listeners'
+    + 'Total Ghost Listeners'
+    + 'Total N/A entries'
+    + 'Total sessions'
+3. Converting 'computed_data' dictionary to pandas dataframe 'df_computed'
+4. Appending 'df_computed' to 'df_monitored'
+5. Exporting the resulting 'df' to a .csv file (e.g: lahma_1989-11-09-1111.csv)
 '''
 def autoExport():
     global n_hours
     threading.Timer(n_hours * 3600.0, autoExport).start()
     timestamp = datetime.datetime.now()
     time = str(timestamp.time())[:5]
+    time = time.replace(':', '') 
     date = timestamp.date()
     
-    df = pd.DataFrame(monitored_data)
-    
-    total_valid_listeners = sum(df['valid'])
-    # df.loc[len(df)] = ['Total valid users', None, None, total_valid_listeners]
-    computed_data['valid'][0] = len(df)
+    df_monitored = pd.DataFrame(monitored_data)
+
+    ''' Logging 'Total Listeners'
+    '''
+    computed_data['valid'][0] = len(df_monitored)
+
+    ''' Logging 'Total Valid Listeners (more than 5min)
+    '''
+    total_valid_listeners = sum(df_monitored['valid'])
     computed_data['valid'][1] = total_valid_listeners
+
+    ''' Logging 'Total Ghost Listeners' (less than 60s)
+    '''
+    computed_data['valid'][2] = 0
+    for entry in df_monitored['connected_time']:
+        if (len(entry) == 1 and 
+            entry[0][1] < datetime.timedelta(seconds=60)
+            ):
+            computed_data['valid'][2] += 1
+
+    ''' Logging 'Total N/A Entries'
+    '''
+    computed_data['valid'][3] = 0
+    for entry in df_monitored['location']:
+        if entry == 'N/A':
+            computed_data['valid'][3] += 1
+
+    ''' Logging 'Total Listening Sessions'
+    '''
+    computed_data['valid'][4] = 0
+    for entry in df_monitored['connected_time']:
+        computed_data['valid'][4] += len(entry)
+
+    df_computed = pd.DataFrame(computed_data)
+
+    df = df_monitored.append(df_computed)
+    df['valid'] = df['valid'].astype('uint16')
     
-    df2 = pd.DataFrame(computed_data)
-    
-    # print(computed_data)
-    
-    df = df.append(df2)
-    
-    df.to_csv('lahma_' + str(date) + '_' + time + '.csv', index=False)
+    df.to_csv('lahma_{}_{}.csv'.format(date, time), index=False)
     print('> export on ' + str(timestamp)[:-7])
 
 '''

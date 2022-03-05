@@ -97,8 +97,7 @@ def snapshot(minutes_threshold):
             else:
                 monitored_data['valid'].append(0)
 
-    # print('snapshot on ' + str(timestamp)[:-7])
-
+    print('{}: snapshot'.format(str(timestamp)[11:-7]))
 
 '''
 This method automates the snapshot() method every 30 seconds.
@@ -167,11 +166,11 @@ def autoExport():
 
     df_computed = pd.DataFrame(computed_data)
 
-    df = df_monitored.append(df_computed)
+    df = pd.concat([df_monitored, df_computed])
     df['valid'] = df['valid'].astype('uint16')
     
     df.to_csv('lahma_{}_{}.csv'.format(date, time), index=False)
-    print('> export on ' + str(timestamp)[:-7])
+    print('{}: export'.format(str(timestamp)[11:-7]))
 
 '''
 This method aggregates the two automated methods above to allow 
@@ -180,21 +179,24 @@ $ python API_autoFetcher.py <minutes_threshold> <n_hours>
 '''
 def automate(minutes_threshold, n):
 
-    autoFetch(float(minutes_threshold))
-
     global n_hours
     n_hours = float(n)
-    time.sleep(n_hours * 3600)
-    autoExport()
+    print('\n{}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'.format(str(datetime.datetime.now())[:11]))
+    print('{}: launching'.format(str(datetime.datetime.now())[11:-7]))
+    print(f'          - script automated every {n_hours*3600} seconds')
 
+    time.sleep(n_hours * 3600)
+
+    autoFetch(float(minutes_threshold))
+    autoExport()
 
 if __name__ == '__main__':
 
     if len(sys.argv) != 3:
-        print('''------ Enter two integer parameters as shown in example below: 
------- $ python API_autoFetcher.py 5 24
-------
------- (above script validates a listener above 5 minutes of listening time,
------- exports and returns total number of valid listeners every 24 hours)''')
+        print('''--- Enter two integer parameters as shown in example below: 
+--- $ python API_autoFetcher.py 5 24
+---
+--- (above script validates a listener above 5 minutes of listening time,
+--- exports and returns total number of valid listeners every 24 hours)''')
     else:
         automate(sys.argv[1], sys.argv[2])

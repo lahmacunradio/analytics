@@ -168,9 +168,11 @@ def autoExport():
 
     df = pd.concat([df_monitored, df_computed])
     df['valid'] = df['valid'].astype('uint16')
+
+    filename = 'lahma_{}_{}.csv'.format(date, time)
     
-    df.to_csv('lahma_{}_{}.csv'.format(date, time), index=False)
-    print('{}: export'.format(str(timestamp)[11:-7]))
+    df.to_csv(filename, index=False)
+    print('{}: exporting {}'.format(str(timestamp)[11:-7], filename))
 
 '''
 This method aggregates the two automated methods above to allow 
@@ -185,9 +187,9 @@ def automate(minutes_threshold, n):
     print('{}: launching'.format(str(datetime.datetime.now())[11:-7]))
     print(f'          - script automated every {n_hours*3600} seconds')
 
-    time.sleep(n_hours * 3600)
-
     autoFetch(float(minutes_threshold))
+    
+    time.sleep(n_hours * 3600)
     autoExport()
 
 if __name__ == '__main__':

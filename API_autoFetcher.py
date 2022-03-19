@@ -24,8 +24,8 @@ monitored_data = {
 computed_data = {
     'ip': [
       'Total Listeners', 
-      'Total Valid Listeners', 
-      'Total Ghost Listeners', 
+      'Total Long Listeners', 
+      'Total Short Listeners', 
       'Total N/A entries',
       'Total Sessions'
     ],
@@ -36,13 +36,40 @@ computed_data = {
 
 global n_hours
 
+'''
+This method reinitializes the temporary dictionaries used to
+populate the Pandas.DataFrame that will be outputted in the csv.
+'''
+def reinitializer() -> None:
+    global monitored_data
+    global computed_data
+    monitored_data = {
+        'ip': [],
+        'location': [],
+        'connected_time': [],
+        'valid': []
+    }
+    computed_data = {
+        'ip': [
+        'Total Listeners', 
+        'Total Valid Listeners', 
+        'Total Ghost Listeners', 
+        'Total N/A entries',
+        'Total Sessions'
+        ],
+        'location': [None, None, None, None, None],
+        'connected_time': [None, None, None, None, None],
+        'valid': [0, 0, 0, 0, 0]
+    }
+
+    print('> reinitializing dataframe')
 
 '''
 This method fetches the Azuracast API and updates 'monitored_data' dictionary above.
 An integer is passed as argument representing the minimum minutes threshold
 under which a listener is considered 'not valid'.
 '''
-def snapshot(minutes_threshold):
+def snapshot(minutes_threshold: int) -> None:
 
     headers = {'Authorization': API_KEY}
     res = requests.get('https://streaming.lahmacun.hu/api/station/1/listeners', headers=headers)
@@ -99,13 +126,14 @@ def snapshot(minutes_threshold):
 
     print('{}: snapshot'.format(str(timestamp)[11:-7]))
 
+
 '''
 This method automates the snapshot() method every 30 seconds.
 An integer is passed as an argument representing the minimum minutes threshold
 under which a listener is considered not 'valid'. If no argument is specified,
 the default value is set to 5 minutes.
 '''
-def autoFetch(minutes_threshold = 5):
+def autoFetch(minutes_threshold: int = 5) -> None:
     threading.Timer(30.0, autoFetch).start()
     snapshot(minutes_threshold)
 
@@ -123,7 +151,7 @@ This method automates the three steps below every n hours.
 4. Appending 'df_computed' to 'df_monitored'
 5. Exporting the resulting 'df' to a .csv file (e.g: lahma_1989-11-09-1111.csv)
 '''
-def autoExport():
+def autoExport() -> None:
     global n_hours
     threading.Timer(n_hours * 3600.0, autoExport).start()
     timestamp = datetime.datetime.now()
@@ -174,12 +202,15 @@ def autoExport():
     df.to_csv(filename, index=False)
     print('{}: exporting {}'.format(str(timestamp)[11:-7], filename))
 
+    reinitializer()
+
+
 '''
 This method aggregates the two automated methods above to allow 
 method call with passed arguments through the command line. Format below :
 $ python API_autoFetcher.py <minutes_threshold> <n_hours>
 '''
-def automate(minutes_threshold, n):
+def automate(minutes_threshold: int, n: int) -> None:
 
     global n_hours
     n_hours = float(n)

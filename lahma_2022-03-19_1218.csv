@@ -1,7 +1,0 @@
-ip,location,connected_time,valid
-192.168.128.6,N/A,"[['2022-03-19 12:18:22', datetime.timedelta(seconds=34685)]]",1
-Total Listeners,,,1
-Total Valid Listeners,,,1
-Total Ghost Listeners,,,0
-Total N/A entries,,,1
-Total Sessions,,,1

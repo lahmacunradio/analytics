@@ -4,24 +4,25 @@ import time
 import threading
 import pandas as pd
 import sys
-
+from typing import Dict
 
 '''
 Create and import custom module 'access.py' to access your own API token and log in.
 See 'access_template.py' for template.
 '''
 import access
-API_KEY = access.MY_KEY
+API_KEY: str = access.MY_KEY
 
+Vector = Dict[str, list]
 
-monitored_data = {
+monitored_data: Vector = {
     'ip': [],
     'location': [],
     'connected_time': [],
     'valid': []
 }
 
-computed_data = {
+computed_data: Vector = {
     'ip': [
       'Total Listeners', 
       'Total Long Listeners', 
@@ -34,7 +35,7 @@ computed_data = {
     'valid': [0, 0, 0, 0, 0]
 }
 
-global n_hours
+n_hours: float = 24.0
 
 '''
 This method reinitializes the temporary dictionaries used to
@@ -43,17 +44,19 @@ populate the Pandas.DataFrame that will be outputted in the csv.
 def reinitializer() -> None:
     global monitored_data
     global computed_data
+
     monitored_data = {
         'ip': [],
         'location': [],
         'connected_time': [],
         'valid': []
     }
+
     computed_data = {
         'ip': [
         'Total Listeners', 
-        'Total Valid Listeners', 
-        'Total Ghost Listeners', 
+        'Total Long Listeners', 
+        'Total Short Listeners', 
         'Total N/A entries',
         'Total Sessions'
         ],
@@ -69,13 +72,13 @@ This method fetches the Azuracast API and updates 'monitored_data' dictionary ab
 An integer is passed as argument representing the minimum minutes threshold
 under which a listener is considered 'not valid'.
 '''
-def snapshot(minutes_threshold: int) -> None:
+def snapshot() -> None:
 
-    headers = {'Authorization': API_KEY}
+    headers: dict = {'Authorization': API_KEY}
     res = requests.get('https://streaming.lahmacun.hu/api/station/1/listeners', headers=headers)
     results = res.json()
 
-    minutes_threshold = datetime.timedelta(minutes=minutes_threshold)
+    threshold = datetime.timedelta(minutes=5)
 
     for listener in results:
 
@@ -102,13 +105,13 @@ def snapshot(minutes_threshold: int) -> None:
             i = monitored_data['ip'].index(ip)
             if connected_time >= monitored_data['connected_time'][i][-1][1]:
                 monitored_data['connected_time'][i][-1][1] = connected_time
-                if connected_time > minutes_threshold:
+                if connected_time > threshold:
                     monitored_data['valid'][i] = 1
                 else:
                     monitored_data['valid'][i] = 0
             else:
                 monitored_data['connected_time'][i].append([formatted_timestamp, connected_time])
-                if connected_time > minutes_threshold:
+                if connected_time > threshold:
                     monitored_data['valid'][i] = 1
                 else:
                     monitored_data['valid'][i] = 0
@@ -119,7 +122,7 @@ def snapshot(minutes_threshold: int) -> None:
             monitored_data['location'].append(loc)
             monitored_data['connected_time'].append([[formatted_timestamp, connected_time]])
 
-            if connected_time > minutes_threshold:
+            if connected_time > threshold:
                 monitored_data['valid'].append(1)
             else:
                 monitored_data['valid'].append(0)
@@ -133,9 +136,9 @@ An integer is passed as an argument representing the minimum minutes threshold
 under which a listener is considered not 'valid'. If no argument is specified,
 the default value is set to 5 minutes.
 '''
-def autoFetch(minutes_threshold: int = 5) -> None:
+def autoFetch() -> None:
     threading.Timer(30.0, autoFetch).start()
-    snapshot(minutes_threshold)
+    snapshot()
 
 
 '''
@@ -210,7 +213,7 @@ This method aggregates the two automated methods above to allow
 method call with passed arguments through the command line. Format below :
 $ python API_autoFetcher.py <minutes_threshold> <n_hours>
 '''
-def automate(minutes_threshold: int, n: int) -> None:
+def automate(n: float = 24) -> None:
 
     global n_hours
     n_hours = float(n)
@@ -218,18 +221,19 @@ def automate(minutes_threshold: int, n: int) -> None:
     print('{}: launching'.format(str(datetime.datetime.now())[11:-7]))
     print(f'          - script automated every {n_hours*3600} seconds')
 
-    autoFetch(float(minutes_threshold))
+    autoFetch()
     
     time.sleep(n_hours * 3600)
     autoExport()
 
 if __name__ == '__main__':
 
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 2:
         print('''--- Enter two integer parameters as shown in example below: 
---- $ python API_autoFetcher.py 5 24
+--- $ python API_autoFetcher.py 24
 ---
 --- (above script validates a listener above 5 minutes of listening time,
 --- exports and returns total number of valid listeners every 24 hours)''')
     else:
-        automate(sys.argv[1], sys.argv[2])
+        automate(float(sys.argv[1]))
+        pass

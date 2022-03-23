@@ -127,7 +127,7 @@ def snapshot() -> None:
             else:
                 monitored_data['valid'].append(0)
 
-    print('{}: snapshot'.format(str(timestamp)[11:-7]))
+    # print('{}: snapshot'.format(str(timestamp)[11:-7]))
 
 
 '''

@@ -38,10 +38,9 @@ Lahmacun is a community music webradio based in Budapest.
 ## Usage:
 Methods from *API_autoFetcher.py* can be called through the command line, like so:
 
-    $ python API_autoFetcher.py <minutes_threshold> <n_hours>
+    $ python fetcher.py <n_hours>
 
-1. **<minutes_threshold>** : minimum listening time threshold to validate a listener (in minutes).
-2. **<n_hours>** : determines the occurrences of exports (in hours).
+**<n_hours>** : determines the occurrences of exports (in hours).
 
 ## Details on outputted csv file :
 

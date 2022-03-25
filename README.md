@@ -54,5 +54,3 @@ Each array contains 2 time values (in python module *datetime* format):
         [datetime.datetime(2021, 10, 14, 12, 58, 48, 479164), datetime.timedelta(seconds=79463)]]
         
 In the example above, the user has first connected to the broadcast on *Oct 14, 2021 at 12:23:58* for *31261 seconds*, and a little later at *12:58:48* for *79463* seconds.
-
-Test

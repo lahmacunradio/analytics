@@ -12,6 +12,7 @@ See 'access_template.py' for template.
 '''
 import access
 API_KEY: str = access.MY_KEY
+OUTPUT_PATH = '/var/www/html/stats/'
 
 Vector = Dict[str, list]
 
@@ -36,6 +37,8 @@ computed_data: Vector = {
 }
 
 n_hours: float = 24.0
+LONG_LISTENER_MINUTE_THRESHOLD = 5
+SHORT_LISTENER_MINUTE_THRESHOLD = 60
 
 '''
 This method reinitializes the temporary dictionaries used to
@@ -78,7 +81,7 @@ def snapshot() -> None:
     res = requests.get('https://streaming.lahmacun.hu/api/station/1/listeners', headers=headers)
     results = res.json()
 
-    threshold = datetime.timedelta(minutes=5)
+    threshold = datetime.timedelta(minutes=LONG_LISTENER_MINUTE_THRESHOLD)
 
     for listener in results:
 
@@ -146,8 +149,8 @@ This method automates the three steps below every n hours.
 1. Converting the 'monitored_data' dictionary to pandas dataframe 'df_monitored'
 2. Logging following data to 'computed_data' dictionary :
     + 'Total Listeners'
-    + 'Total Valid Listeners'
-    + 'Total Ghost Listeners'
+    + 'Total Long Listeners'
+    + 'Total Short Listeners'
     + 'Total N/A entries'
     + 'Total sessions'
 3. Converting 'computed_data' dictionary to pandas dataframe 'df_computed'
@@ -173,12 +176,12 @@ def autoExport() -> None:
     total_valid_listeners = sum(df_monitored['valid'])
     computed_data['valid'][1] = total_valid_listeners
 
-    ''' Logging 'Total Ghost Listeners' (less than 60s)
+    ''' Logging 'Total Short Listeners' (less than 60s)
     '''
     computed_data['valid'][2] = 0
     for entry in df_monitored['connected_time']:
         if (len(entry) == 1 and 
-            entry[0][1] < datetime.timedelta(seconds=60)
+            entry[0][1] < datetime.timedelta(seconds=SHORT_LISTENER_MINUTE_THRESHOLD)
             ):
             computed_data['valid'][2] += 1
 
@@ -202,7 +205,7 @@ def autoExport() -> None:
 
     filename = 'lahma_{}_{}.csv'.format(date, time)
     
-    df.to_csv(filename, index=False)
+    df.to_csv(OUTPUT_PATH + filename, index=False)
     print('{}: exporting {}'.format(str(timestamp)[11:-7], filename))
 
     reinitializer()

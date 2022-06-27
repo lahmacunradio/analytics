@@ -1,21 +1,32 @@
+''' Importing dependencies
+'''
+import sys
+import os
 import requests
-import datetime
+from datetime import datetime, timedelta
 import time
 import threading
 import pandas as pd
-import sys
 from typing import Dict
+from dotenv import load_dotenv
 
+''' Importing environment variables (OUTPUT_PATH, API_KEY)
 '''
-Create and import custom module 'access.py' to access your own API token and log in.
-See 'access_template.py' for template.
-'''
-import access
-API_KEY: str = access.MY_KEY
-OUTPUT_PATH = '/var/www/html/stats/'
+load_dotenv()
 
+''' Constants
+'''
+OUTPUT_PATH: str = os.getenv('OUTPUT_PATH')
+API_KEY: str = os.getenv('API_KEY')
+LONG_LISTENER_MINUTE_THRESHOLD: int = 5
+SHORT_LISTENER_MINUTE_THRESHOLD: int = 1
+
+''' Custom types
+'''
 Vector = Dict[str, list]
 
+''' Variables
+'''
 monitored_data: Vector = {
     'ip': [],
     'location': [],
@@ -37,8 +48,17 @@ computed_data: Vector = {
 }
 
 n_hours: float = 24.0
-LONG_LISTENER_MINUTE_THRESHOLD = 5
-SHORT_LISTENER_MINUTE_THRESHOLD = 60
+launch_time = datetime.now()
+
+warning_message = '''--- Enter two integer parameters as shown in example below: 
+--- $ python fetcher.py 24
+---
+--- (above script validates a listener above 5 minutes of listening time,
+--- exports and returns total number of valid listeners every 24 hours)'''
+
+# ------------------------------------------------------------------
+# Functions
+# ------------------------------------------------------------------
 
 '''
 This method reinitializes the temporary dictionaries used to
@@ -47,6 +67,7 @@ populate the Pandas.DataFrame that will be outputted in the csv.
 def reinitializer() -> None:
     global monitored_data
     global computed_data
+    global launch_time
 
     monitored_data = {
         'ip': [],
@@ -68,7 +89,12 @@ def reinitializer() -> None:
         'valid': [0, 0, 0, 0, 0]
     }
 
+    launch_time = datetime.now()
+
     print('> reinitializing dataframe')
+
+def resetTimeDelta():
+    pass
 
 '''
 This method fetches the Azuracast API and updates 'monitored_data' dictionary above.
@@ -77,19 +103,27 @@ under which a listener is considered 'not valid'.
 '''
 def snapshot() -> None:
 
+    global launch_time
+    print('launch time', str(launch_time)[11:-7])
     headers: dict = {'Authorization': API_KEY}
     res = requests.get('https://streaming.lahmacun.hu/api/station/1/listeners', headers=headers)
     results = res.json()
 
-    threshold = datetime.timedelta(minutes=LONG_LISTENER_MINUTE_THRESHOLD)
+    threshold = timedelta(minutes=LONG_LISTENER_MINUTE_THRESHOLD)
 
-    for listener in results:
+    timestamp = datetime.now()
+
+    formatted_timestamp = timestamp.isoformat(sep=' ')
+    formatted_timestamp = str(formatted_timestamp)[11:-7]
+    
+    print(f'SNAPSHOT : total listeners {len(results)} -- timestamp : {str(timestamp)[11:-7]} -- time since launch: {str(timestamp - launch_time)[:-7]}')
+
+    for i, listener in enumerate(results):
 
         connected_time = listener['connected_time']
-        connected_time = datetime.timedelta(seconds=connected_time)
-        timestamp = datetime.datetime.now()
-        formatted_timestamp = timestamp.isoformat(sep=' ')
-        formatted_timestamp = str(formatted_timestamp)[:-7]
+        connected_time = timedelta(seconds=connected_time)
+
+        connected_time_since_launch = timestamp - launch_time
 
         ip = listener['ip']
 
@@ -105,7 +139,12 @@ def snapshot() -> None:
 
         # if user is/has been already listening
         if ip in monitored_data['ip']:
+            print('\t\tExisting user')
             i = monitored_data['ip'].index(ip)
+
+            if connected_time > connected_time_since_launch:
+                connected_time = connected_time_since_launch
+
             if connected_time >= monitored_data['connected_time'][i][-1][1]:
                 monitored_data['connected_time'][i][-1][1] = connected_time
                 if connected_time > threshold:
@@ -121,8 +160,16 @@ def snapshot() -> None:
 
         # if new user is detected
         else:
+            print('\t\tNEW USER')
             monitored_data['ip'].append(ip)
             monitored_data['location'].append(loc)
+
+            print('\t\tconnected_time :',connected_time )
+            print('\t\tconnected_time_since_launch :',connected_time_since_launch )
+
+            if connected_time > connected_time_since_launch:
+                connected_time = connected_time_since_launch
+
             monitored_data['connected_time'].append([[formatted_timestamp, connected_time]])
 
             if connected_time > threshold:
@@ -130,8 +177,9 @@ def snapshot() -> None:
             else:
                 monitored_data['valid'].append(0)
 
-    # print('{}: snapshot'.format(str(timestamp)[11:-7]))
+        # print(f'\t\tIP {ip} | {monitored_data["connected_time"]}\n')
 
+    print(f'\t\tmonitored_data {monitored_data}\n')
 
 '''
 This method automates the snapshot() method every 30 seconds.
@@ -160,7 +208,7 @@ This method automates the three steps below every n hours.
 def autoExport() -> None:
     global n_hours
     threading.Timer(n_hours * 3600.0, autoExport).start()
-    timestamp = datetime.datetime.now()
+    timestamp = datetime.now()
     time = str(timestamp.time())[:5]
     time = time.replace(':', '') 
     date = timestamp.date()
@@ -181,7 +229,7 @@ def autoExport() -> None:
     computed_data['valid'][2] = 0
     for entry in df_monitored['connected_time']:
         if (len(entry) == 1 and 
-            entry[0][1] < datetime.timedelta(seconds=SHORT_LISTENER_MINUTE_THRESHOLD)
+            entry[0][1] < timedelta(minutes=SHORT_LISTENER_MINUTE_THRESHOLD)
             ):
             computed_data['valid'][2] += 1
 
@@ -204,9 +252,13 @@ def autoExport() -> None:
     df['valid'] = df['valid'].astype('uint16')
 
     filename = 'lahma_{}_{}.csv'.format(date, time)
-    
-    df.to_csv(OUTPUT_PATH + filename, index=False)
-    print('{}: exporting {}'.format(str(timestamp)[11:-7], filename))
+
+    try:
+        df.to_csv(OUTPUT_PATH + filename, index=False, sep =';')
+        print('{}: exporting {} in output folder.'.format(str(timestamp)[11:-7], OUTPUT_PATH + filename))
+    except:
+        df.to_csv(filename, index=False, sep =';')
+        print('{}: exporting {} in current folder'.format(str(timestamp)[11:-7], filename))
 
     reinitializer()
 
@@ -220,9 +272,8 @@ def automate(n: float = 24) -> None:
 
     global n_hours
     n_hours = float(n)
-    print('\n{}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'.format(str(datetime.datetime.now())[:11]))
-    print('{}: launching'.format(str(datetime.datetime.now())[11:-7]))
-    print(f'          - script automated every {n_hours*3600} seconds')
+    print('\n{}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'.format(str(datetime.now())[:11]))
+    print(f'\t- script automated every {n_hours*3600} seconds')
 
     autoFetch()
     
@@ -232,11 +283,6 @@ def automate(n: float = 24) -> None:
 if __name__ == '__main__':
 
     if len(sys.argv) != 2:
-        print('''--- Enter two integer parameters as shown in example below: 
---- $ python API_autoFetcher.py 24
----
---- (above script validates a listener above 5 minutes of listening time,
---- exports and returns total number of valid listeners every 24 hours)''')
+        print(warning_message)
     else:
         automate(float(sys.argv[1]))
-        pass

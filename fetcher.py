@@ -115,8 +115,6 @@ def snapshot() -> None:
 
     formatted_timestamp = timestamp.isoformat(sep=' ')
     formatted_timestamp = str(formatted_timestamp)[11:-7]
-    
-    print(f'SNAPSHOT : total listeners {len(results)} -- timestamp : {str(timestamp)[11:-7]} -- time since launch: {str(timestamp - launch_time)[:-7]}')
 
     for i, listener in enumerate(results):
 
@@ -139,7 +137,6 @@ def snapshot() -> None:
 
         # if user is/has been already listening
         if ip in monitored_data['ip']:
-            print('\t\tExisting user')
             i = monitored_data['ip'].index(ip)
 
             if connected_time > connected_time_since_launch:
@@ -160,12 +157,8 @@ def snapshot() -> None:
 
         # if new user is detected
         else:
-            print('\t\tNEW USER')
             monitored_data['ip'].append(ip)
             monitored_data['location'].append(loc)
-
-            print('\t\tconnected_time :',connected_time )
-            print('\t\tconnected_time_since_launch :',connected_time_since_launch )
 
             if connected_time > connected_time_since_launch:
                 connected_time = connected_time_since_launch
@@ -177,9 +170,6 @@ def snapshot() -> None:
             else:
                 monitored_data['valid'].append(0)
 
-        # print(f'\t\tIP {ip} | {monitored_data["connected_time"]}\n')
-
-    print(f'\t\tmonitored_data {monitored_data}\n')
 
 '''
 This method automates the snapshot() method every 30 seconds.

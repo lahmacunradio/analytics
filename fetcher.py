@@ -146,7 +146,7 @@ def snapshot() -> None:
                 monitored_data['connected_time'][i][-1][1] = connected_time
                 if connected_time > threshold:
                     monitored_data['valid'][i] = 1
-                else:
+                elif not monitored_data['valid'][i] == 1:
                     monitored_data['valid'][i] = 0
             else:
                 monitored_data['connected_time'][i].append([formatted_timestamp, connected_time])

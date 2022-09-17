@@ -2,18 +2,18 @@
 
 <img width="408" alt="lahma" src="https://user-images.githubusercontent.com/84317349/139689563-4ab78163-26f0-4a4c-a745-847eecfbfd55.png">
 
-Contributions to Lahmacun Radio analytics team.<br>
 Lahmacun is a community music webradio based in Budapest.
 
-## Objectives:
-1. Get number of unique listeners per day:
+## Objective
+1. Use the radio streaming server's (an Azuracast instance) `listeners` API response to collect and derive listening stats. 
+2. Get number of unique listeners per day:
     + fetch AzuraCast API
     + store relevant data in a Python dictionary
     + automate API snapshot twice every minute to update dictionary
-    + automate export to csv (or parquet ? feather?) + return of total valid listeners every n hours
-2. Get total listened time per show per week
+    + automate export to csv + return of total "long" and "short" listeners every n hours
+3. Get total listened time per show per week (future work)
 
-## Dependencies:
+## Dependencies
 
 ### 1. Create a virtual environment : 
 + on Linux/Mac OS: 
@@ -35,22 +35,36 @@ Lahmacun is a community music webradio based in Budapest.
 
         pip install -r requirements.txt
 
-## Usage:
+## Usage
 Methods from *API_autoFetcher.py* can be called through the command line, like so:
 
     $ python fetcher.py <n_hours>
 
 **<n_hours>** : determines the occurrences of exports (in hours).
 
-## Details on outputted csv file :
+## Output file specification
 
-In [example.csv](/example.csv), the first two fields 'ip' and 'location' are self-explanatory. The third field 'connected_time' is populated by arrays of one or more arrays. If there are indeed several arrays, this means the corresponding user has connected several times to the broadcast. NB: by *connected*, we mean pressing play until pressing pause or closing tab.
+### **Listeners and sessions**
 
-Each array contains 2 time values (in python module *datetime* format):
-+ timestamp of connection
-+ connection time (in seconds)
+The periodic csv has the following structure: 
 
-        [[datetime.datetime(2021, 10, 14, 12, 23, 58, 464265), datetime.timedelta(seconds=31261)], 
-        [datetime.datetime(2021, 10, 14, 12, 58, 48, 479164), datetime.timedelta(seconds=79463)]]
-        
-In the example above, the user has first connected to the broadcast on *Oct 14, 2021 at 12:23:58* for *31261 seconds*, and a little later at *12:58:48* for *79463* seconds.
+![image info](./images/listener_sessions.jpg)
+
+Each row contains the IP address of the listener (`ip`), the country based on this address (`location`), an array of listening sessions for the listener (`connected_time` where every element of the array is another array containing the starting time and the length of the session), and a validity flag for long listing sessions (`valid` where 1 if there was at least one session lasting more than 5 minutes, 0 otherwise). 
+
+Note that the starting time is returned in an `hours:minutes:seconds.microseconds` format. 
+
+If the location cannot be determined (due to missing data in the API response of Azuracast), then the row's location shows `N/A`. Note that, in this case, a distinct IP address is usually unknown and, as a result, multiple distinct users may be mapped to the same generic IP address. 
+
+### **Aggregated results**
+
+In the end of each csv file, the an aggregation block is computed such as: 
+
+![image info](./images/aggregation.jpg)
+
+`Total Listeners` means the number of all listening sessions, `Total Long Listeners` means the number of sessions longer than 5 minutes, `Total Short Listeners` means the number of sessions less than 1 minutes, `Total N/A entries` means the number of unknown users (again, the real number of listeners may be more), and `Total Sessions` means the total number of listening sessions (formally, the number of tuples in all `connected_time` arrays). 
+
+### **Example**
+
+[example_daily.csv](/examples/example_daily.csv) shows a complete example output file for a day's traffic. 
+

@@ -1,0 +1,46 @@
+ip;location;connected_time;valid
+185.62.102.68;Russia;[['22:00:33.03271', datetime.timedelta(seconds=9598, microseconds=28743)], ['00:40:37.00364', datetime.timedelta(seconds=17490)], ['05:34:47.88427', datetime.timedelta(seconds=15745)], ['09:57:27.84500', datetime.timedelta(seconds=43366)]];1
+34.142.42.110;United States;[['22:58:34.71221', datetime.timedelta(seconds=602)], ['03:47:13.92686', datetime.timedelta(seconds=582)]];1
+35.197.230.89;United States;[['00:10:36.32743', datetime.timedelta(seconds=589)]];1
+91.224.179.30;Ukraine;[['00:26:36.77996', datetime.timedelta(seconds=4)]];0
+34.105.143.42;United States;[['01:23:08.54189', datetime.timedelta(seconds=591)]];1
+34.142.16.72;United States;[['02:34:41.03055', datetime.timedelta(seconds=609)], ['08:30:54.75285', datetime.timedelta(seconds=607)]];1
+84.236.73.32;Hungary;[['04:39:46.02842', datetime.timedelta(seconds=2025)], ['05:16:47.46220', datetime.timedelta(seconds=61)], ['13:38:03.98410', datetime.timedelta(seconds=1067)], ['21:32:20.78042', datetime.timedelta(seconds=33)]];0
+34.105.250.203;United States;[['04:59:16.98903', datetime.timedelta(seconds=600)]];1
+37.76.26.61;Hungary;[['05:20:17.55945', datetime.timedelta(seconds=900)]];1
+121.91.37.6;Australia;[['05:34:17.87338', datetime.timedelta(0)]];0
+34.142.1.253;United States;[['06:10:19.17185', datetime.timedelta(seconds=586)], ['17:10:41.68348', datetime.timedelta(seconds=580)]];1
+106.197.4.75;India;[['06:18:19.53314', datetime.timedelta(seconds=2)]];0
+176.77.133.232;Hungary;[['07:02:50.92737', datetime.timedelta(seconds=4)]];0
+34.89.14.155;United States;[['07:20:21.70052', datetime.timedelta(seconds=605)], ['14:39:06.01776', datetime.timedelta(seconds=603)]];1
+37.76.23.41;Hungary;[['08:53:55.66484', datetime.timedelta(seconds=23)], ['12:43:32.50117', datetime.timedelta(seconds=525)]];1
+88.107.194.162;United Kingdom;[['08:54:55.71914', datetime.timedelta(seconds=10)]];0
+62.201.122.205;Hungary;[['09:04:26.08689', datetime.timedelta(seconds=383)], ['10:08:58.04321', datetime.timedelta(seconds=1017)], ['12:27:32.08704', datetime.timedelta(seconds=961)]];1
+35.242.155.124;United States;[['09:41:27.43595', datetime.timedelta(seconds=595)], ['18:20:43.97849', datetime.timedelta(seconds=611)]];1
+176.63.31.240;Hungary;[['09:47:27.53330', datetime.timedelta(seconds=594)], ['09:57:27.84500', datetime.timedelta(seconds=502)]];1
+82.77.127.150;Romania;[['10:13:58.31746', datetime.timedelta(seconds=1286)]];1
+77.11.163.114;Germany;[['10:13:58.31746', datetime.timedelta(seconds=41)], ['10:53:29.27015', datetime.timedelta(seconds=13)]];0
+78.131.18.214;Hungary;[['10:27:58.78284', datetime.timedelta(seconds=12)]];0
+35.246.90.248;United States;[['10:54:59.34317', datetime.timedelta(seconds=1197)], ['15:51:08.75520', datetime.timedelta(seconds=1162)]];1
+89.133.138.202;Hungary;[['11:01:29.61035', datetime.timedelta(seconds=1167)]];1
+178.2.220.162;Germany;[['11:20:30.18248', datetime.timedelta(seconds=914)]];1
+81.17.190.21;Hungary;[['11:47:31.01134', datetime.timedelta(seconds=13)]];0
+35.246.4.100;United States;[['12:15:31.88323', datetime.timedelta(seconds=586)]];1
+89.186.114.204;Hungary;[['13:10:33.31125', datetime.timedelta(seconds=599)]];1
+34.142.0.37;United States;[['13:26:33.72980', datetime.timedelta(seconds=571)]];1
+84.225.202.228;Hungary;[['14:14:35.17080', datetime.timedelta(seconds=48)]];0
+84.225.200.135;Hungary;[['14:55:06.64375', datetime.timedelta(seconds=49)]];0
+176.63.7.44;Hungary;[['15:27:37.67772', datetime.timedelta(seconds=5)]];0
+94.21.96.160;Hungary;[['15:37:08.96995', datetime.timedelta(seconds=470)], ['15:59:39.01557', datetime.timedelta(seconds=20)]];0
+194.171.57.97;Netherlands;[['16:04:39.18704', datetime.timedelta(seconds=7)]];0
+85.10.23.177;Slovenia;[['17:26:42.25087', datetime.timedelta(seconds=10)]];0
+84.85.120.25;Netherlands;[['17:56:43.20196', datetime.timedelta(seconds=1107)]];1
+31.46.255.220;Hungary;[['18:01:43.22255', datetime.timedelta(seconds=2907)], ['18:50:15.01620', datetime.timedelta(seconds=2744)]];1
+93.103.31.65;Slovenia;[['19:21:46.18034', datetime.timedelta(seconds=14)]];0
+34.105.148.253;United States;[['19:31:16.59743', datetime.timedelta(seconds=584)], ['20:43:18.96991', datetime.timedelta(seconds=723)]];1
+195.91.108.192;Slovakia;[['21:51:21.53190', datetime.timedelta(seconds=18)]];0
+Total Listeners;;;40
+Total Long Listeners;;;23
+Total Short Listeners;;;14
+Total N/A entries;;;0
+Total Sessions;;;60

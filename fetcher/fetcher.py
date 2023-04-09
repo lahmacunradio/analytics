@@ -46,11 +46,11 @@ monitored_data: dict = {
 
 computed_data: dict = {
     'ip': [
-      'Total Listeners', 
-      'Total Long Listeners', 
-      'Total Short Listeners', 
-      'Total N/A entries',
-      'Total Sessions'
+        'Total Listeners',
+        'Total Long Listeners',
+        'Total Short Listeners',
+        'Total N/A entries',
+        'Total Sessions'
     ],
     'location': [None, None, None, None, None],
     'connected_time': [None, None, None, None, None],
@@ -88,11 +88,11 @@ def reinitializer() -> None:
 
     computed_data = {
         'ip': [
-        'Total Listeners', 
-        'Total Long Listeners', 
-        'Total Short Listeners', 
-        'Total N/A entries',
-        'Total Sessions'
+            'Total Listeners',
+            'Total Long Listeners',
+            'Total Short Listeners',
+            'Total N/A entries',
+            'Total Sessions'
         ],
         'location': [None, None, None, None, None],
         'connected_time': [None, None, None, None, None],
@@ -109,91 +109,102 @@ def snapshot() -> None:
     This method fetches the Azuracast API and updates 'monitored_data' dictionary above.
     '''
 
-    global launch_time
-    print('> launch time', str(launch_time)[11:19])
+    try:
+        global launch_time
+        print('> launch time', str(launch_time)[11:19])
 
-    '''
-    Connecting to Azuracast API
-    '''
-    headers: dict = {'Authorization': API_KEY}
-    res = requests.get('https://streaming.lahmacun.hu/api/station/1/listeners', headers=headers)
-    results = res.json()
+        '''
+        Connecting to Azuracast API
+        '''
+        headers: dict = {'Authorization': API_KEY}
+        res = requests.get(
+            'https://streaming.lahmacun.hu/api/station/1/listeners', headers=headers)
 
-    '''
-    Initializing 'threshold' time delta in minutes 
-    above which a listener is considered a "long listener"
-    '''
-    threshold = timedelta(minutes=LONG_LISTENER_THRES)
+        # print(">>", res.headers['content-type'])
+        # exit()
+        results = res.json()
 
-    timestamp = datetime.now().astimezone()
-    formatted_timestamp = timestamp.isoformat(sep=' ')
-    formatted_timestamp = str(formatted_timestamp)[11:-7]
+        '''
+        Initializing 'threshold' time delta in minutes 
+        above which a listener is considered a "long listener"
+        '''
+        threshold = timedelta(minutes=LONG_LISTENER_THRES)
 
-    for i, listener in enumerate(results):
+        timestamp = datetime.now().astimezone()
+        formatted_timestamp = timestamp.isoformat(sep=' ')
+        formatted_timestamp = str(formatted_timestamp)[11:-7]
 
-        connected_time = listener['connected_time']
-        connected_time = timedelta(seconds=connected_time)
+        for i, listener in enumerate(results):
 
-        connected_time_since_launch = timestamp - launch_time
+            connected_time = listener['connected_time']
+            connected_time = timedelta(seconds=connected_time)
 
-        ip = listener['ip']
+            connected_time_since_launch = timestamp - launch_time
 
-        if listener['location']['status'] == 'error':
-            '''
-            This handles the case where the API is malfunctioning and returns
-            'error' as location status and one or a couple identical IPs for all listeners
-            '''
-            loc = 'N/A'
-            computed_data['valid'][3] += 1
-        else:
-            loc = listener['location']['country']
+            ip = listener['ip']
 
-        if connected_time > connected_time_since_launch:
-            '''
-            If listener has been listening since previous monitoring process
-            (in other words, in production, since previous day)
-            this caps their listening time for the current monitored day
-            at the time passed since the current process launch
-            '''
-            connected_time = connected_time_since_launch
-
-        if ip in monitored_data['ip']:
-            '''
-            In the case the user is/has been already listening.
-            '''
-            idx = monitored_data['ip'].index(ip)
-
-            if connected_time >= monitored_data['connected_time'][idx][-1][1]:
-                ''' 
-                In the case the user has been listening since last snapshot.
+            if listener['location']['status'] == 'error':
                 '''
-                monitored_data['connected_time'][idx][-1][1] = connected_time
-                if connected_time > threshold:
-                    monitored_data['valid'][idx] = 1
-                elif not monitored_data['valid'][idx] == 1:
-                    monitored_data['valid'][idx] = 0
+                This handles the case where the API is malfunctioning and returns
+                'error' as location status and one or a couple identical IPs for all listeners
+                '''
+                loc = 'N/A'
+                computed_data['valid'][3] += 1
             else:
+                loc = listener['location']['country']
+
+            if connected_time > connected_time_since_launch:
                 '''
-                In the case the user has started a new listening session.
+                If listener has been listening since previous monitoring process
+                (in other words, in production, since previous day)
+                this caps their listening time for the current monitored day
+                at the time passed since the current process launch
                 '''
-                monitored_data['connected_time'][idx].append([formatted_timestamp, connected_time])
-                if connected_time > threshold:
-                    monitored_data['valid'][idx] = 1
+                connected_time = connected_time_since_launch
+
+            if ip in monitored_data['ip']:
+                '''
+                In the case the user is/has been already listening.
+                '''
+                idx = monitored_data['ip'].index(ip)
+
+                if connected_time >= monitored_data['connected_time'][idx][-1][1]:
+                    ''' 
+                    In the case the user has been listening since last snapshot.
+                    '''
+                    monitored_data['connected_time'][idx][-1][1] = connected_time
+                    if connected_time > threshold:
+                        monitored_data['valid'][idx] = 1
+                    elif not monitored_data['valid'][idx] == 1:
+                        monitored_data['valid'][idx] = 0
                 else:
-                    monitored_data['valid'][idx] = 0
+                    '''
+                    In the case the user has started a new listening session.
+                    '''
+                    monitored_data['connected_time'][idx].append(
+                        [formatted_timestamp, connected_time])
+                    if connected_time > threshold:
+                        monitored_data['valid'][idx] = 1
+                    else:
+                        monitored_data['valid'][idx] = 0
 
-        else:
-            '''
-            In the case a new user is detected.
-            '''
-            monitored_data['ip'].append(ip)
-            monitored_data['location'].append(loc)
-            monitored_data['connected_time'].append([[formatted_timestamp, connected_time]])
-
-            if connected_time > threshold:
-                monitored_data['valid'].append(1)
             else:
-                monitored_data['valid'].append(0)
+                '''
+                In the case a new user is detected.
+                '''
+                monitored_data['ip'].append(ip)
+                monitored_data['location'].append(loc)
+                monitored_data['connected_time'].append(
+                    [[formatted_timestamp, connected_time]])
+
+                if connected_time > threshold:
+                    monitored_data['valid'].append(1)
+                else:
+                    monitored_data['valid'].append(0)
+
+    except Exception as err:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        print(f"{type(err)} (line {exc_tb.tb_lineno}) : {err}")
 
 
 def autoFetch() -> None:
@@ -227,9 +238,9 @@ def autoExport() -> None:
     threading.Timer(n_hours * 3600.0, autoExport).start()
     timestamp = datetime.now().astimezone()
     time = str(timestamp.time())[:5]
-    time = time.replace(':', '') 
+    time = time.replace(':', '')
     date = timestamp.date()
-    
+
     df_monitored = pd.DataFrame(monitored_data)
 
     '''
@@ -249,8 +260,8 @@ def autoExport() -> None:
     '''
     computed_data['valid'][2] = 0  # resetting value to 0 before incrementing count
     for entry in df_monitored['connected_time']:
-        if (len(entry) == 1 and 
-            entry[0][1] < timedelta(minutes=SHORT_LISTENER_THRES)
+        if (len(entry) == 1 and
+                entry[0][1] < timedelta(minutes=SHORT_LISTENER_THRES)
             ):
             computed_data['valid'][2] += 1
 
@@ -280,11 +291,13 @@ def autoExport() -> None:
     filename = 'lahma_{}_{}.csv'.format(date, time)
 
     try:
-        df.to_csv(OUTPUT_PATH + filename, index=False, sep =';')
-        print('> {}: exporting {} in output folder.'.format(str(timestamp)[11:19], OUTPUT_PATH + filename))
+        df.to_csv(OUTPUT_PATH + filename, index=False, sep=';')
+        print('> {}: exporting {} in output folder.'.format(
+            str(timestamp)[11:19], OUTPUT_PATH + filename))
     except:
-        df.to_csv(filename, index=False, sep =';')
-        print('> {}: exporting {} in current folder'.format(str(timestamp)[11:19], filename))
+        df.to_csv(filename, index=False, sep=';')
+        print('> {}: exporting {} in current folder'.format(
+            str(timestamp)[11:19], filename))
 
     reinitializer()
 
@@ -302,11 +315,12 @@ def process_data_fetching(n: float = 24) -> None:
 
     global n_hours
     n_hours = float(n)
-    print('\n{}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'.format(str(datetime.now().astimezone())[:11]))
+    print('\n{}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'.format(
+        str(datetime.now().astimezone())[:11]))
     print(f'> script automated every {n_hours*3600} seconds')
 
     autoFetch()
-    
+
     time.sleep(n_hours * 3600)
     autoExport()
 

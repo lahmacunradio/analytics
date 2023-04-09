@@ -1,8 +1,4 @@
-# Lahmacun Radio Analytics
-
-<img width="408" alt="lahma" src="https://user-images.githubusercontent.com/84317349/139689563-4ab78163-26f0-4a4c-a745-847eecfbfd55.png">
-
-Lahmacun is a community music webradio based in Budapest.
+# API fetcher
 
 ## Objective
 1. Use the radio streaming server's (an Azuracast instance) `listeners` API response to collect and derive listening stats. 
